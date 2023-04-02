@@ -11,4 +11,5 @@ typedef struct Node {
 
 
 Node* insertNode(Node* node, int key);
+Node* deleteNode(Node* root, int key);
 void printPretty(Node* root);

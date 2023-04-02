@@ -110,6 +110,81 @@ Node* insertNode(Node* node, int key) {
     return node;
 }
 
+
+Node* minValueNode(Node* node) {
+    Node* current = node;
+    while (current->left != NULL)
+        current = current->left;
+    return current;
+}
+
+Node* deleteNode(Node* root, int key) {
+    // Step 1: Perform standard BST delete
+    if (root == NULL)
+        return root;
+
+    if (key < root->key)
+        root->left = deleteNode(root->left, key);
+    else if (key > root->key)
+        root->right = deleteNode(root->right, key);
+    else {
+        if ((root->left == NULL) || (root->right == NULL)) {
+            Node* temp = root->left ? root->left : root->right;
+
+            if (temp == NULL) {
+                temp = root;
+                root = NULL;
+            }
+            else
+                *root = *temp;
+
+            free(temp);
+        }
+        else {
+            Node* temp = minValueNode(root->right);
+            root->key = temp->key;
+            root->right = deleteNode(root->right, temp->key);
+        }
+    }
+
+    // If the tree had only one node then return
+    if (root == NULL)
+        return root;
+
+    // Step 2: Update the height of the current node
+    root->height = 1 + max(height(root->left), height(root->right));
+
+    // Step 3: Get the balance factor
+    int balance = getBalance(root);
+
+    // Step 4: If the node is unbalanced, perform rotations
+
+    // Left Left case
+    if (balance > 1 && getBalance(root->left) >= 0)
+        return rightRotate(root);
+
+    // Left Right case
+    if (balance > 1 && getBalance(root->left) < 0) {
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+
+    // Right Right case
+    if (balance < -1 && getBalance(root->right) <= 0)
+        return leftRotate(root);
+
+    // Right Left case
+    if (balance < -1 && getBalance(root->right) > 0) {
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+
+    return root;
+}
+
+
+
+
 // Calculate the width of the tree
 int getWidth(int height) {
     if (height == 1)
@@ -128,6 +203,7 @@ void printTree(int** M, Node* root, int col, int row, int height) {
 
 // Print the tree in a pretty format
 void printPretty(Node* root) {
+    printf("\n\n");
     int h = height(root);
     int w = getWidth(h);
     int** M = (int**)malloc(h * sizeof(int*));
