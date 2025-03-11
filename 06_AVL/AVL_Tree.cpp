@@ -101,6 +101,7 @@ Node* insertNode(Node* node, int key) {
         return rightRotate(node);
     }
 
+    // Right Left Case
     if (balance < -1 && key < node->right->key) {
         node->right = rightRotate(node->right);
         return leftRotate(node);
